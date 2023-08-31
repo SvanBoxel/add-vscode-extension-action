@@ -81,11 +81,10 @@ const main = async () => {
     auth: process.env.GITHUB_TOKEN,
   });
 
-  let repos = getRepos(octokit, config.orgName, config.repositories)
+  let repos = await getRepos(octokit, config.orgName, config.repositories)
 
   stats.repositoriesCount = repos.length;
 
-  console.log(repos)
   for (const repo of repos.data) {
     await octokit.git.createRef({
       owner: config.orgName,
