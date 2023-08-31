@@ -3,7 +3,7 @@ const { Octokit } = require("@octokit/rest");
 const core = require('@actions/core');
 
 const config = {
-  orgName: process.env.ORG_NAME,
+  orgName: core.getInput('organization-name'),
   branchName: "add-extension-file",
   commitMessage: "Add/edit vscode default extension file",
   filePath: ".vscode/extensions.json",
