@@ -10,7 +10,7 @@
   "author": "Your Name",
   "license": "MIT",
   "scripts": {
-    "test": "mocha index.test.js",
+    "test": "jest index.test.js",
     "lint": "eslint .",
     "build": "ncc build index.js"
   },
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.4",
+    "jest": "^29.6.4",
     "mocha": "^9.1.1",
     "sinon": "^11.1.1"
   }

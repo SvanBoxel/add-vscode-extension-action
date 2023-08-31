@@ -1,90 +1,130 @@
 const fs = require("fs");
 const { Octokit } = require("@octokit/rest");
 
-// Create a new Octokit instance with your GitHub app's authentication
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
 
-let repos = [];
-if (process.env.INPUT_REPOSITORIES) {
-  // If a list of repositories is provided, get the details of those repositories
-  const repoNames = process.env.INPUT_REPOSITORIES.split(",");
-  for (const repoName of repoNames) {
-    const repo = await octokit.repos.get({
-      owner: orgName,
-      repo: repoName,
-    });
-    repos.push(repo.data);
-  }
-} else {
-  // If no list of repositories is provided, get the list of all repositories in the organization
-  const response = await octokit.repos.listForOrg({
-    org: orgName,
-  });
-  repos = response.data;
+const config = {
+  orgName: process.env.ORG_NAME,
+  branchName: "add-extension-file",
+  commitMessage: "Add/edit vscode default extension file",
+  filePath: ".vscode/extensions.json",
+  input_extensions: process.env.INPUT_EXTENSIONS,
+  repositories: process.env.INPUT_REPOSITORIES,
 }
 
+const getRepos = async (octokit, orgName, repos) => {
+  let resultRepos = [];
 
+  if (repos) {
+    // If a list of repositories is provided, get the details of those repositories
+    const repoNames = repos.split(",");
 
-const addFileToRepo = async (repo) => {
-    // Read the contents of the extension file
-  let extensionFile = {};
-  try {
-    extensionFile = JSON.parse(fs.readFileSync(".vscode/extensions.json"));
-  } catch (error) {
-    // If the file doesn't exist, create an empty object
-    if (error.code === "ENOENT") {
-      extensionFile = {};
-    } else {
-      throw error;
+    for (const repoName of repoNames) {
+      const repo = await octokit.repos.get({
+        owner: orgName,
+        repo: repoName.trim(),
+      });
+      resultRepos.push(repo.data);
     }
+  } else {
+    // If no list of repositories is provided, get the list of all repositories in the organization
+    const response = await octokit.repos.listForOrg({
+      org: orgName,
+    });
+    resultRepos = response.data;
+  }
+
+
+  return resultRepos;
+}
+
+const updateExtensionFile = (currentExtensionContent, extensions) => {
+  if (!currentExtensionContent) return;
+
+  let newExtensionContent; 
+
+  try {
+    newExtensionContent = JSON.parse(currentExtensionContent);
+  } catch (error) {
+    throw new Error("The extensions.json file is not valid JSON");
   }
 
   // Add the Copilot extension to the file
-  if (!extensionFile.recommendations) {
-    extensionFile.recommendations = [];
+  if (!newExtensionContent.recommendations) {
+    newExtensionContent.recommendations = [];
   }
 
-  const recommendedExtensions = process.env.INPUT_EXTENSIONS.split(",");
+  const recommendedExtensions = extensions.split(",");
   for (const extension of recommendedExtensions) {
-    if (!extensionFile.recommendations.includes(extension.trim())) {
-      extensionFile.recommendations.push(extension.trim());
+    if (!newExtensionContent.recommendations.includes(extension.trim())) {
+      newExtensionContent.recommendations.push(extension.trim());
     }
   }
 
-  // Write the updated contents back to the file
-  fs.writeFileSync(".vscode/extensions.json", JSON.stringify(extensionFile, null, 2));
+  return JSON.stringify(newExtensionContent, null, 2);
 }
 
-// For each repository, create a new branch and add the file to the branch
-for (const repo of repos.data) {
-  const branchName = "add-file";
-  const fileContent = process.env.INPUT_FILE_CONTENT;
-  const filePath = process.env.INPUT_FILE_PATH;
-
-  await octokit.git.createRef({
-    owner: orgName,
-    repo: repo.name,
-    ref: `refs/heads/${branchName}`,
-    sha: repo.default_branch,
+const main = async () => {
+  // Create a new Octokit instance with your GitHub app's authentication
+  const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN,
   });
 
-  await octokit.repos.createOrUpdateFileContents({
-    owner: orgName,
-    repo: repo.name,
-    path: filePath,
-    message: "Add file",
-    content: Buffer.from(fileContent).toString("base64"),
-    branch: branchName,
-  });
+  let repos = getRepos(octokit, config.orgName, config.repositories)
 
-  // Create a new pull request from the new branch to the default branch of the repository
-  await octokit.pulls.create({
-    owner: orgName,
-    repo: repo.name,
-    title: "Add file",
-    head: branchName,
-    base: repo.default_branch,
-  });
+  for (const repo of repos.data) {
+    await octokit.git.createRef({
+      owner: config.orgName,
+      repo: repo.name,
+      ref: `refs/heads/${config.branchName}`,
+      sha: repo.default_branch,
+    });
+
+    // checkout file to see if it exists
+    let fileContent = null;
+    try {
+      file = await octokit.repos.getContent({
+        owner: config.orgName,
+        repo: repo.name,
+        path: config.filePath,
+        ref: repo.default_branch,
+      });
+
+      fileContent = Buffer.from(result.data.content, 'base64').toString()
+    } catch (error) {
+      // If the file doesn't exist, create an empty object
+      if (error.code === "ENOENT") {
+        fileContent = "{}";
+      } else {
+        throw error;
+      }
+    }
+
+    const updatedFileContent = updateExtensionFile(fileContent, config.input_extensions);
+
+    await octokit.repos.createOrUpdateFileContents({
+      owner: config.orgName,
+      repo: repo.name,
+      path: config.filePath,
+      message: commitMessage,
+      content: Buffer.from(updatedFileContent).toString("base64"),
+      branch: branchName,
+    });
+
+    // Create a new pull request from the new branch to the default branch of the repository
+    await octokit.pulls.create({
+      owner: config.orgName,
+      repo: repo.name,
+      title: "Add file",
+      head: config.branchName,
+      base: repo.default_branch,
+    });
+  }
+}
+
+// main();
+
+module.exports = {
+  updateExtensionFile,
+  getRepos,
+  main,
 }
