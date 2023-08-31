@@ -7,9 +7,6 @@ inputs:
   organization-name:
     description: 'The name of the organization.'
     required: true
-  organization-name:
-    description: 'The name of the organization.'
-    required: true
   extensions:
     description: 'A list of recommended extensions to add to the .vscode/extensions.json file.'
     required: false
