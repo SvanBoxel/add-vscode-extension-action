@@ -1,0 +1,15 @@
+name: Test workflow
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout action from repo
+        uses: ./
