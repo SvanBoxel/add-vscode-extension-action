@@ -2,6 +2,9 @@
 
 This GitHub Action creates a pull request adding recommended extensions to the `.vscode/extensions.json` file in each repository.
 
+## tldr;
+This GitHub Actions reads the list of repositories to add the file to, adds the recommended extensions to the `.vscode/extensions.jso`n file, creates a new branch, adds the specified file to the branch, and creates a new pull request from the branch to the default branch of the repository for each repository.
+
 ## Inputs
 
 ### `organization-name`
