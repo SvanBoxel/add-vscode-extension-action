@@ -64,12 +64,21 @@ const updateExtensionFile = (currentExtensionContent, extensions) => {
 }
 
 const main = async () => {
-  // Create a new Octokit instance with your GitHub app's authentication
+  const stats = {
+    repositoriesCount: 0,
+    filesUpdated: 0,
+    filesCreated: 0,
+    failed: 0
+    pullRequests: 0,
+  }
+
   const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
   });
 
   let repos = getRepos(octokit, config.orgName, config.repositories)
+
+  stats.repositoriesCount = repos.length;
 
   for (const repo of repos.data) {
     await octokit.git.createRef({
@@ -81,6 +90,7 @@ const main = async () => {
 
     // checkout file to see if it exists
     let fileContent = null;
+    let type = null;
     try {
       file = await octokit.repos.getContent({
         owner: config.orgName,
@@ -90,35 +100,52 @@ const main = async () => {
       });
 
       fileContent = Buffer.from(result.data.content, 'base64').toString()
+      type = 'update'
     } catch (error) {
       // If the file doesn't exist, create an empty object
       if (error.code === "ENOENT") {
         fileContent = "{}";
+        type = 'create'
       } else {
         throw error;
       }
     }
 
-    const updatedFileContent = updateExtensionFile(fileContent, config.input_extensions);
+    let updatedFileContent;
+    try {
+      updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
 
-    await octokit.repos.createOrUpdateFileContents({
-      owner: config.orgName,
-      repo: repo.name,
-      path: config.filePath,
-      message: commitMessage,
-      content: Buffer.from(updatedFileContent).toString("base64"),
-      branch: branchName,
-    });
+      // await octokit.repos.createOrUpdateFileContents({
+      //   owner: config.orgName,
+      //   repo: repo.name,
+      //   path: config.filePath,
+      //   message: commitMessage,
+      //   content: Buffer.from(updatedFileContent).toString("base64"),
+      //   branch: branchName,
+      // });
+  
+      // // Create a new pull request from the new branch to the default branch of the repository
+      // await octokit.pulls.create({
+      //   owner: config.orgName,
+      //   repo: repo.name,
+      //   title: "Add file",
+      //   head: config.branchName,
+      //   base: repo.default_branch,
+      // });
 
-    // Create a new pull request from the new branch to the default branch of the repository
-    await octokit.pulls.create({
-      owner: config.orgName,
-      repo: repo.name,
-      title: "Add file",
-      head: config.branchName,
-      base: repo.default_branch,
-    });
+      if (type === 'create') {
+        stats.filesCreated += 1;
+      } else {
+        stats.filesUpdated += 1;
+      }
+    } catch (error) {
+      console.log(error);
+      stats.failed += 1;
+      continue;
+    }
   }
+
+  console.log(stats);
 }
 
 // main();
