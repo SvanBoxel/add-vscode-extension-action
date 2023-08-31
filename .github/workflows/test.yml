@@ -15,3 +15,6 @@ jobs:
         with:
           path: this-action
       - uses: ./this-action
+        with: 
+          organization-name: svanboxel
+          extensions: ms-vscode.cpptools, ms-python.python
