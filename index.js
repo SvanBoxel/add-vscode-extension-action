@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { Octokit } = require("@octokit/rest");
-
+const core = require('@actions/core');
 
 const config = {
   orgName: process.env.ORG_NAME,
@@ -8,7 +8,7 @@ const config = {
   commitMessage: "Add/edit vscode default extension file",
   filePath: ".vscode/extensions.json",
   input_extensions: process.env.INPUT_EXTENSIONS,
-  repositories: process.env.INPUT_REPOSITORIES,
+  repositories: core.getInput('repositories')
 }
 
 const getRepos = async (octokit, orgName, repos) => {
