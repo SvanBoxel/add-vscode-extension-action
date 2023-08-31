@@ -46,13 +46,12 @@ const addFileToRepo = async (repo) => {
     extensionFile.recommendations = [];
   }
 
-  const recommendedExtensions = JSON.parse(process.env.INPUT_EXTENSIONS);
+  const recommendedExtensions = process.env.INPUT_EXTENSIONS.split(",");
   for (const extension of recommendedExtensions) {
-    if (!extensionFile.recommendations.includes(extension)) {
-      extensionFile.recommendations.push(extension);
+    if (!extensionFile.recommendations.includes(extension.trim())) {
+      extensionFile.recommendations.push(extension.trim());
     }
-  })
-
+  }
 
   // Write the updated contents back to the file
   fs.writeFileSync(".vscode/extensions.json", JSON.stringify(extensionFile, null, 2));

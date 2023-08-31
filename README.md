@@ -25,7 +25,7 @@ This GitHub Actions reads the list of repositories to add the file to, adds the 
 
 ### `extensions`
 
-**Required** A newline-separated list of recommended extensions to add to the `.vscode/extensions.json` file.
+**Required** A comma-separated list of recommended extensions to add to the `.vscode/extensions.json` file.
 
 ## Example usage
 
@@ -51,6 +51,4 @@ jobs:
           file-path: PATH_TO_YOUR_FILE
           file-content: CONTENT_OF_YOUR_FILE
           repositories: repo1,repo2
-          extensions: |
-            ms-vscode.cpptools
-            ms-python.python
+          extensions: ms-vscode.cpptools, ms-python.python

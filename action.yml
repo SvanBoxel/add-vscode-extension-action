@@ -15,7 +15,7 @@ inputs:
     required: false
     default: '[]'
   repositories:
-    description: 'A list of repositories to add the file to.'
+    description: 'A list of repositories to add the file to. If no repositories are specified, the file will be added to all repositories in the organization.'
     required: false
     default: ''
 
