@@ -1,6 +1,6 @@
 # Add File to Repositories Action
 
-This GitHub Action creates a pull request adding a specified file to selected repositories in an organization. It also adds recommended extensions to the `.vscode/extensions.json` file in each repository.
+This GitHub Action creates a pull request adding recommended extensions to the `.vscode/extensions.json` file in each repository.
 
 ## Inputs
 
