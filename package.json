@@ -9,6 +9,11 @@
   },
   "author": "Your Name",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha index.test.js",
+    "lint": "eslint .",
+    "build": "ncc build index.js"
+  },
   "dependencies": {
     "@octokit/rest": "^18.0.0"
   },

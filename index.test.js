@@ -7,7 +7,7 @@ const octokit = new Octokit({
   auth: "test_token",
 });
 
-const addFileToRepo = require("../index").addFileToRepo;
+const addFileToRepo = require("./index").addFileToRepo;
 
 describe("addFileToRepo", () => {
   let sandbox;
