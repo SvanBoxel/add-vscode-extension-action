@@ -11,5 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout action from repo
-        uses: ./
+      - uses: actions/checkout@v3
+        with:
+          path: this-action
+      - uses: ./this-action
