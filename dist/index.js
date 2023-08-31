@@ -85,7 +85,7 @@ const main = async () => {
 
   stats.repositoriesCount = repos.length;
 
-  console.log(repo)
+  console.log(repos)
   for (const repo of repos.data) {
     await octokit.git.createRef({
       owner: config.orgName,
