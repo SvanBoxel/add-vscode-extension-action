@@ -68,8 +68,7 @@ const main = async () => {
     repositoriesCount: 0,
     filesUpdated: 0,
     filesCreated: 0,
-    failed: 0
-    pullRequests: 0,
+    failed: 0,
   }
 
   const octokit = new Octokit({
