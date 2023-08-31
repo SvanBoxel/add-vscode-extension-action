@@ -147,7 +147,7 @@ const main = async () => {
   console.log(stats);
 }
 
-// main();
+main();
 
 module.exports = {
   updateExtensionFile,
