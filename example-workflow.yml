@@ -1,0 +1,23 @@
+name: Add file to all repos
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  add-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Add file to all repos
+        uses: ./path/to/action
+        with:
+          organization-name: YOUR_ORGANIZATION_NAME
+          file-path: PATH_TO_YOUR_FILE
+          file-content: CONTENT_OF_YOUR_FILE
+          extensions: |
+            ms-vscode.cpptools
+            ms-python.python

@@ -1,0 +1,24 @@
+name: Add file to all repos
+
+description: |
+  This action creates a pull request adding a certain file to all repositories in an organization.
+
+inputs:
+  organization-name:
+    description: 'The name of the organization.'
+    required: true
+  organization-name:
+    description: 'The name of the organization.'
+    required: true
+  extensions:
+    description: 'A list of recommended extensions to add to the .vscode/extensions.json file.'
+    required: false
+    default: '[]'
+  repositories:
+    description: 'A list of repositories to add the file to.'
+    required: false
+    default: ''
+
+runs:
+  using: "node12"
+  main: "index.js"
