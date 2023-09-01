@@ -55,6 +55,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
             // if (!exists) return null;
 
             console.log({
+              content,
               exists,
             })
 
@@ -184,11 +185,6 @@ const main = async () => {
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
 
-      console.log({
-        owner: config.orgName,
-        repo: repo.name,
-        updatedFileContent: updatedFileContent,
-      })
       await createPr(octokit, config.orgName, repo.name, updatedFileContent);
 
       if (type === 'create') {
