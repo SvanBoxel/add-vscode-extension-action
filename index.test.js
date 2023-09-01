@@ -112,28 +112,32 @@ describe('createPr', () => {
     const octokit = new Octokit();
     composeCreatePullRequest.mockResolvedValueOnce({});
 
-    await createPr(octokit, 'my-org', 'my-repo', '{"recommendations": ["ext1", "ext2"]}', { base: 'main', branchName: 'my-branch' });
+    const options = {
+      base: 'main123',
+      branchName: 'branch-cool',
+      commitMessage: 'committing!!',
+      pullRequestTitle:  'PR title partiej',
+      pullRequestBody: 'PR body',
+      authorName: 'cool author',
+      authorEmail: 'with_a_cool@email.com'
+    }
+    await createPr(octokit, 'my-org', 'my-repo', '{"recommendations": ["ext1", "ext2"]}', options);
 
     expect(composeCreatePullRequest).toHaveBeenCalledWith(octokit, 
       expect.objectContaining({
       owner: 'my-org',
       repo: 'my-repo',
-      title: 'pull request title',
-      body: 'pull request description',
-      head: 'my-branch',
-      base: 'main',
-      update: false,
+      title: options.pullRequestTitle,
+      body: options.pullRequestBody,
+      head: options.branchName,
+      base: options.base,
+      update: true,
       forceFork: false,
       changes: [expect.objectContaining({
-        commit: 'creating ...',
+        commit: options.commitMessage,
         author: {
-          name: 'Author LastName',
-          email: 'Author.LastName@acme.com',
-          date: expect.any(String),
-        },
-        committer: {
-          name: 'Committer LastName',
-          email: "Committer.LastName@acme.com",
+          name: options.authorName,
+          email: options.authorEmail,
           date: expect.any(String),
         },
         files: {

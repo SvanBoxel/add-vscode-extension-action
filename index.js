@@ -5,25 +5,17 @@ const { Octokit } = require("@octokit/rest");
 const { composeCreatePullRequest } = require("octokit-plugin-create-pull-request");
 
 const core = require('@actions/core');
-
-
-const config = {
-  orgName: core.getInput('organization-name'),
-  input_extensions: core.getInput('extensions'),
-  repositories: core.getInput('repositories'),
-  token: core.getInput('github-token'),
-  branchName: "add-extension-file",
-  commitMessage: "Add/edit vscode default extension file",
-  filePath: ".vscode/extensions.json",
-}
+const FILE_PATH = ".vscode/extensions.json";
 
 const createPr = async (octokit, owner, repo, newContent, options) => {
   const defaultOptions = {
-    base: "main",
-    branchName: "add-extension-file",
-    pullRequestTitle: "Adding recommended extensions to vscode recommedations file",
-    pullRequestBody: "Adding recommended extensions to vscode recommedations file",
-    commitMessage: "Add/edit vscode recommended extension file",
+    base: core.getInput('base'),
+    branchName: core.getInput('branch-name'),
+    pullRequestTitle:  core.getInput('pull-request-title'),
+    pullRequestBody: core.getInput('pull-request-body'),
+    commitMessage: core.getInput('commit-message'),
+    authorName: core.getInput('author'),
+    authorEmail: core.getInput('author-email')
   }
 
   const mergedOptions = {
@@ -42,33 +34,17 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
     forceFork: false /* optional: force creating fork even when user has write rights */,
     changes: [
       {
-        /* optional: if `files` is not passed, an empty commit is created instead */
         files: {
-          [config.filePath]: ({ exists }) => {
-            // // do not create the file if it does not exist
-            // if (!exists) return null;
-
-            console.log({
-              newContent,
-              exists,
-            })
-
+          [FILE_PATH]: ({ exists }) => {
             return Buffer.from(btoa(newContent), 'base64').toString("utf-8")
           },
         },
-        commit: config.commitMessage,
+        commit: mergedOptions.commitMessage,
         author: {
-          name: "Author LastName",
-          email: "Author.LastName@acme.com",
+          name: mergedOptions.authorName,
+          email: mergedOptions.authorEmail,
           date: new Date().toISOString(), // must be ISO date string
         },
-        /* optional: if not passed, will use the information set in author */
-        committer: {
-          name: "Committer LastName",
-          email: "Committer.LastName@acme.com",
-          date: new Date().toISOString(), // must be ISO date string
-        },
-        /* optional: if not passed, commit won't be signed*/
         signature: async function (commitPayload) {
           // import { createSignature } from 'github-api-signature'
           //
@@ -144,10 +120,10 @@ const main = async () => {
   }
 
   const octokit = new Octokit({
-    auth: config.token
+    auth: core.getInput('github-token')
   });
 
-  let repos = await getRepos(octokit, config.orgName, config.repositories)
+  let repos = await getRepos(octokit, core.getInput('organization-name'), core.getInput('repositories'))
 
   stats.repositoriesCount = repos.length;
 
@@ -159,7 +135,7 @@ const main = async () => {
       file = await octokit.repos.getContent({
         owner: config.orgName,
         repo: repo.name,
-        path: config.filePath,
+        path: FILE_PATH,
         ref: repo.default_branch,
       });
 
@@ -168,6 +144,9 @@ const main = async () => {
     } catch (error) {
       // If the file doesn't exist, create an empty object
       if (error.code === "ENOENT" || error.status === 404 ) {
+        if (core.getInput('only-if-file-exists') === true) {
+          continue
+        }
         fileContent = "{}";
         type = 'create'
       } else {
@@ -177,15 +156,17 @@ const main = async () => {
 
     let updatedFileContent;
     try {
-      updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
+      updatedFileContent = updateExtensionFile(fileContent, core.getInput('extensions'), type);
 
-      console.log({
-        owner: config.orgName,
-        repo: repo.name,
-        updatedFileContent: updatedFileContent,
-      })
-      
-      await createPr(octokit, config.orgName, repo.name, updatedFileContent);
+      await createPr(octokit, config.orgName, repo.name, updatedFileContent, {
+        author_name: config.author_name,
+        author_email: config.author_email,
+        pullRequestTitle: config.pull_request_title,
+        pullRequestBody: config.pull_request_body,
+        commitMessage: config.commit_message,
+        base: repo.default_branch,
+        branchName: "add-extension-file",
+      });
 
       if (type === 'create') {
         stats.filesCreated += 1;
