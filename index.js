@@ -64,6 +64,23 @@ const updateExtensionFile = (currentExtensionContent, extensions) => {
   return JSON.stringify(newExtensionContent, null, 2);
 }
 
+const createRef = async (octokit, owner, repo, ref) => {
+  const result = await octokit.git.getRef({
+    owner,
+    repo,
+    ref
+  });
+
+  const sha = result.data.object.sha;
+  await octokit.git.createRef({
+    owner,
+    repo,
+    ref,
+    sha,
+  });
+}
+
+
 const main = async () => {
   const stats = {
     repositoriesCount: 0,
@@ -84,12 +101,7 @@ const main = async () => {
     repos
   })
   for (const repo of repos) {
-    await octokit.git.createRef({
-      owner: config.orgName,
-      repo: repo.name,
-      ref: `refs/heads/${config.branchName}`,
-      sha: repo.default_branch,
-    });
+    await createRef(octokit, config.orgName, repo.name, `refs/heads/${config.branchName}`)
 
     // checkout file to see if it exists
     let fileContent = null;
