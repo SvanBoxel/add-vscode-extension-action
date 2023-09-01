@@ -163,7 +163,7 @@ const main = async () => {
       type = 'update'
     } catch (error) {
       // If the file doesn't exist, create an empty object
-      if (error.code === "404") {
+      if (error.code === "ENOENT" || error.status === 404 ) {
         fileContent = "{}";
         type = 'create'
       } else {
