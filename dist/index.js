@@ -23,20 +23,27 @@ const config = {
   filePath: ".vscode/extensions.json",
 }
 
-const createPr = async (octokit, owner, repo, newContent, {
-  base,
-  branchName
-} = {
-  base: "main",
-  branchName: config.branchName
-}) => {
+const createPr = async (octokit, owner, repo, newContent, options) => {
+  const defaultOptions = {
+    base: "main",
+    branchName: "add-extension-file",
+    pullRequestTitle: "Adding recommended extensions to vscode recommedations file",
+    pullRequestBody: "Adding recommended extensions to vscode recommedations file",
+    commitMessage: "Add/edit vscode recommended extension file",
+  }
+
+  const mergedOptions = {
+    ...defaultOptions,
+    ...options
+  }
+
   composeCreatePullRequest(octokit, {
     owner,
     repo,
-    title: "pull request title",
-    body: "pull request description",
-    head: branchName,
-    base: base,
+    title: mergedOptions.pullRequestTitle,
+    body: mergedOptions.pullRequestBody,
+    head: mergedOptions.branchName,
+    base: mergedOptions.base,
     update: true /* update existing pull requests */,
     forceFork: false /* optional: force creating fork even when user has write rights */,
     changes: [
@@ -50,8 +57,7 @@ const createPr = async (octokit, owner, repo, newContent, {
             return Buffer.from(btoa(newContent), encoding).toString("utf-8")
           },
         },
-        commit:
-          "creating ...",
+        commit: config.commitMessage,
         author: {
           name: "Author LastName",
           email: "Author.LastName@acme.com",
