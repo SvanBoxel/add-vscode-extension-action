@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { Octokit: OctokitCore} = require("@octokit/rest");
+const { Octokit } = require("@octokit/rest");
 
 
 const { composeCreatePullRequest } = require("octokit-plugin-create-pull-request");

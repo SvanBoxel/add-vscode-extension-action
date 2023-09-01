@@ -5,7 +5,7 @@
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const fs = __nccwpck_require__(7147);
-const { Octokit: OctokitCore} = __nccwpck_require__(9133);
+const { Octokit } = __nccwpck_require__(9133);
 
 
 const { composeCreatePullRequest } = __nccwpck_require__(5321);
@@ -173,7 +173,7 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
+      await createPr(octokit, config.orgName, repo.name, updatedFileContent);
 
       if (type === 'create') {
         stats.filesCreated += 1;
