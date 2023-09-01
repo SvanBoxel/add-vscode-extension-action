@@ -8,7 +8,7 @@ This GitHub Actions reads the list of repositories to add the file to, adds the 
 
 ## Inputs
 
-- `github-token`: **Required**. The GitHub token to use for authentication.
+- `github-token`: **Required**. The GitHub token to use for authentication.  Should have access to repositories listed in the repositories input.
 - `organization-name`: **Required**. The name of the organization that owns the repositories to update.
 - `repositories`: A comma-separated list of repository names to update. If not provided, all repositories in the organization will be updated.
 - `extensions`: **Required**. A comma-separated list of recommended VS Code extensions to add to the `extensions.json` file.

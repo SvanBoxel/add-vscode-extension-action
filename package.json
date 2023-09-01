@@ -10,7 +10,7 @@
   "author": "Your Name",
   "license": "MIT",
   "scripts": {
-    "test": "jest index.test.js",
+    "test": "jest src/index.test.js",
     "lint": "eslint .",
     "build": "ncc build index.js"
   },

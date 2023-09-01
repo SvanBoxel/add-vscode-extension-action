@@ -2,7 +2,7 @@ const fs = require("fs");
 const { Octokit } = require("@octokit/rest");
 
 const assert = require('assert');
-const { updateExtensionFile, getRepos, createPr } = require('./index');
+const { updateExtensionFile, getRepos, createPr } = require('./');
 const { composeCreatePullRequest } = require("octokit-plugin-create-pull-request");
 
 jest.mock("@octokit/rest");

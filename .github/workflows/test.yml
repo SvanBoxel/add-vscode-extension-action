@@ -1,4 +1,4 @@
-name: Test workflow
+name: Run tests
 
 on:
   push:
@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          path: this-action
-      - uses: ./this-action
-        with: 
-          organization-name: svanboxel
-          extensions: ms-vscode.cpptools, ms-python.python
+      - uses: actions/checkout@v2
+      - name: Run unit tests
+        run: npm test

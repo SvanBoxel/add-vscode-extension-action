@@ -48,7 +48,7 @@ inputs:
     required: false
     default: 'add-vscode-extension-action'
   github-token: 
-    description: 'The GitHub token to use for authentication.'
+    description: 'The GitHub token to use for authentication. Should have access to repositories listed in the repositories input.'
     required: true
 
 runs:
