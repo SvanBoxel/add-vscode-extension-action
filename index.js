@@ -167,7 +167,7 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
+      await createPr(octokit, config.orgName, repo.name, updatedFileContent);
 
       if (type === 'create') {
         stats.filesCreated += 1;

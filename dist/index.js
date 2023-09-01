@@ -8,24 +8,19 @@ const fs = __nccwpck_require__(7147);
 const { Octokit: OctokitCore} = __nccwpck_require__(9133);
 
 
-const {
-  createPullRequest,
-  DELETE_FILE,
-} = __nccwpck_require__(5321);
-
-const Octokit = OctokitCore.plugin(createPullRequest);
+const { composeCreatePullRequest } = __nccwpck_require__(5321);
 
 const core = __nccwpck_require__(5290);
 
 
 const config = {
   orgName: core.getInput('organization-name'),
-  branchName: "add-extension-file",
-  commitMessage: "Add/edit vscode default extension file",
-  filePath: ".vscode/extensions.json",
   input_extensions: core.getInput('extensions'),
   repositories: core.getInput('repositories'),
   token: core.getInput('github-token'),
+  branchName: "add-extension-file",
+  commitMessage: "Add/edit vscode default extension file",
+  filePath: ".vscode/extensions.json",
 }
 
 const createPr = async (octokit, owner, repo, newContent, {
@@ -35,15 +30,14 @@ const createPr = async (octokit, owner, repo, newContent, {
   base: "main",
   branchName: config.branchName
 }) => {
-  octokit
-  .createPullRequest({
+  composeCreatePullRequest(octokit, {
     owner,
     repo,
     title: "pull request title",
     body: "pull request description",
     head: branchName,
     base: base,
-    update: false /* optional: set to `true` to enable updating existing pull requests */,
+    update: true /* update existing pull requests */,
     forceFork: false /* optional: force creating fork even when user has write rights */,
     changes: [
       {
@@ -180,23 +174,6 @@ const main = async () => {
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
       const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
-      // await octokit.repos.createOrUpdateFileContents({
-      //   owner: config.orgName,
-      //   repo: repo.name,
-      //   path: config.filePath,
-      //   message: commitMessage,
-      //   content: Buffer.from(updatedFileContent).toString("base64"),
-      //   branch: branchName,
-      // });
-  
-      // // Create a new pull request from the new branch to the default branch of the repository
-      // await octokit.pulls.create({
-      //   owner: config.orgName,
-      //   repo: repo.name,
-      //   title: "Add file",
-      //   head: config.branchName,
-      //   base: repo.default_branch,
-      // });
 
       if (type === 'create') {
         stats.filesCreated += 1;
@@ -216,6 +193,7 @@ const main = async () => {
 main();
 
 module.exports = {
+  createPr,
   updateExtensionFile,
   getRepos,
   main,
