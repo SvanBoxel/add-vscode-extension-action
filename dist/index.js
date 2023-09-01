@@ -5,7 +5,9 @@
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const fs = __nccwpck_require__(7147);
-const { Octokit } = __nccwpck_require__(9133);
+const { Octokit: OctokitCore} = __nccwpck_require__(9133);
+const Octokit = OctokitCore.plugin(createPullRequest);
+
 const core = __nccwpck_require__(5290);
 
 const {

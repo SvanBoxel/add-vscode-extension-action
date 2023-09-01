@@ -1,5 +1,7 @@
 const fs = require("fs");
-const { Octokit } = require("@octokit/rest");
+const { Octokit: OctokitCore} = require("@octokit/rest");
+const Octokit = OctokitCore.plugin(createPullRequest);
+
 const core = require('@actions/core');
 
 const {
