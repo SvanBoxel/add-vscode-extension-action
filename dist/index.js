@@ -158,7 +158,7 @@ const main = async () => {
         ref: repo.default_branch,
       });
 
-      fileContent = Buffer.from(result.data.content, 'base64').toString()
+      fileContent = Buffer.from(file.data.content, 'base64').toString()
       type = 'update'
     } catch (error) {
       // If the file doesn't exist, create an empty object
