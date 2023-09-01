@@ -2,24 +2,19 @@ const fs = require("fs");
 const { Octokit: OctokitCore} = require("@octokit/rest");
 
 
-const {
-  createPullRequest,
-  DELETE_FILE,
-} = require("octokit-plugin-create-pull-request");
-
-const Octokit = OctokitCore.plugin(createPullRequest);
+const { composeCreatePullRequest } = require("octokit-plugin-create-pull-request");
 
 const core = require('@actions/core');
 
 
 const config = {
   orgName: core.getInput('organization-name'),
-  branchName: "add-extension-file",
-  commitMessage: "Add/edit vscode default extension file",
-  filePath: ".vscode/extensions.json",
   input_extensions: core.getInput('extensions'),
   repositories: core.getInput('repositories'),
   token: core.getInput('github-token'),
+  branchName: "add-extension-file",
+  commitMessage: "Add/edit vscode default extension file",
+  filePath: ".vscode/extensions.json",
 }
 
 const createPr = async (octokit, owner, repo, newContent, {
@@ -29,8 +24,7 @@ const createPr = async (octokit, owner, repo, newContent, {
   base: "main",
   branchName: config.branchName
 }) => {
-  octokit
-  .createPullRequest({
+  composeCreatePullRequest(octokit, {
     owner,
     repo,
     title: "pull request title",
@@ -174,23 +168,6 @@ const main = async () => {
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
       const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
-      // await octokit.repos.createOrUpdateFileContents({
-      //   owner: config.orgName,
-      //   repo: repo.name,
-      //   path: config.filePath,
-      //   message: commitMessage,
-      //   content: Buffer.from(updatedFileContent).toString("base64"),
-      //   branch: branchName,
-      // });
-  
-      // // Create a new pull request from the new branch to the default branch of the repository
-      // await octokit.pulls.create({
-      //   owner: config.orgName,
-      //   repo: repo.name,
-      //   title: "Add file",
-      //   head: config.branchName,
-      //   base: repo.default_branch,
-      // });
 
       if (type === 'create') {
         stats.filesCreated += 1;
@@ -210,6 +187,7 @@ const main = async () => {
 main();
 
 module.exports = {
+  createPr,
   updateExtensionFile,
   getRepos,
   main,

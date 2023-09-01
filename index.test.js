@@ -1,18 +1,19 @@
+const fs = require("fs");
 const { Octokit } = require("@octokit/rest");
 
 const assert = require('assert');
-const { updateExtensionFile, getRepos } = require('./index');
-
+const { updateExtensionFile, getRepos, createPr } = require('./index');
+const { composeCreatePullRequest } = require("octokit-plugin-create-pull-request");
 
 jest.mock("@octokit/rest");
+jest.mock("octokit-plugin-create-pull-request");
 
 afterEach(async () => {
   jest.clearAllMocks();
 });
 
-
 describe("getRepos", () => {
-  const octokit = new Octokit({ auth: "some-token" });
+  let octokit;
 
   const mockOrgName = "test-org";
   const mockRepos = ["test-repo1", "test-repo2"]
@@ -29,12 +30,16 @@ describe("getRepos", () => {
     ],
   };
 
+
+
   beforeEach(() => {    
+    octokit = new Octokit({ auth: "some-token" });
+    
     octokit.repos = {
       listForOrg:  jest.fn().mockResolvedValue(mockResponse),
       get: jest.fn()
         .mockReturnValueOnce({ data: mockResponse.data[0] })
-        .mockReturnValueOnce({ data: mockResponse.data[1] })
+        .mockReturnValueOnce({ data:mockResponse.data[1] })
     }
   });
 
@@ -98,5 +103,44 @@ describe('updateExtensionFile', () => {
     assert.throws(() => {
       updateExtensionFile(currentExtensionContent);
     }, /The extensions.json file is not valid JSON/);
+  });
+});
+
+
+describe('createPr', () => {
+  it('should create a pull request with the new content', async () => {
+    const octokit = new Octokit();
+    composeCreatePullRequest.mockResolvedValueOnce({});
+
+    await createPr(octokit, 'my-org', 'my-repo', '{"recommendations": ["ext1", "ext2"]}', { base: 'main', branchName: 'my-branch' });
+
+    expect(composeCreatePullRequest).toHaveBeenCalledWith(octokit, 
+      expect.objectContaining({
+      owner: 'my-org',
+      repo: 'my-repo',
+      title: 'pull request title',
+      body: 'pull request description',
+      head: 'my-branch',
+      base: 'main',
+      update: false,
+      forceFork: false,
+      changes: [expect.objectContaining({
+        commit: 'creating ...',
+        author: {
+          name: 'Author LastName',
+          email: 'Author.LastName@acme.com',
+          date: expect.any(String),
+        },
+        committer: {
+          name: 'Committer LastName',
+          email: "Committer.LastName@acme.com",
+          date: expect.any(String),
+        },
+        files: {
+          '.vscode/extensions.json': expect.any(Function),
+        }
+      })]
+      // signature: expect.any(Function),
+    }));
   });
 });
