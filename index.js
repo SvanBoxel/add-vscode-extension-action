@@ -14,7 +14,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
     pullRequestTitle:  core.getInput('pull-request-title'),
     pullRequestBody: core.getInput('pull-request-body'),
     commitMessage: core.getInput('commit-message'),
-    authorName: core.getInput('author'),
+    authorName: core.getInput('author-name'),
     authorEmail: core.getInput('author-email')
   }
 
@@ -22,6 +22,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
     ...defaultOptions,
     ...options
   }
+
 
   composeCreatePullRequest(octokit, {
     owner,
