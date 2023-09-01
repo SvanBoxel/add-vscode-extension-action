@@ -20,10 +20,10 @@ inputs:
     required: false
     default: 'false'
   author-name:
-    description: The author name. Use ${{ github.actor }} for user who triggered the workflow run.
+    description: "The author name. Use ${{ github.actor }} for user who triggered the workflow run."
     default: 'github-actions[bot]'
   author-email:
-    description: The author email. Use ${{ github.actor }}@users.noreply.github.com for user who triggered the workflow run.
+    description: "The author email. Use ${{ github.actor }}@users.noreply.github.com for user who triggered the workflow run."
     default: 'github-actions[bot]@users.noreply.github.com' 
   pull-request-title: 
     description: 'The title of the pull request.'
