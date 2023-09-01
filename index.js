@@ -17,10 +17,9 @@ const config = {
   token: core.getInput('github-token'),
 }
 
-const createPr = async (octokit, owner, repo, {
+const createPr = async (octokit, owner, repo, content, {
   base,
-  branchName, 
-  content
+  branchName
 } = {
   base: "main",
   branchName: config.branchName
@@ -169,7 +168,7 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-      const a  = await createPr(octokit, config.orgName, repo.name, {});
+      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent, {});
       console.log(a)
       // await octokit.repos.createOrUpdateFileContents({
       //   owner: config.orgName,
