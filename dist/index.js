@@ -56,6 +56,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
 
             console.log({
               newContent,
+              encoding,
               exists,
             })
 
