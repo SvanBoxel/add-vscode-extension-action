@@ -29,11 +29,6 @@ const createPr = async (octokit, owner, repo, newContent, {
   base: "main",
   branchName: config.branchName
 }) => {
-
-  console.log(22, {
-    base, 
-    branchName
-  })
   octokit
   .createPullRequest({
     owner,
@@ -178,8 +173,7 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent, {});
-      console.log(a)
+      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
       // await octokit.repos.createOrUpdateFileContents({
       //   owner: config.orgName,
       //   repo: repo.name,

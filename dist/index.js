@@ -28,7 +28,7 @@ const config = {
   token: core.getInput('github-token'),
 }
 
-const createPr = async (octokit, owner, repo, content, {
+const createPr = async (octokit, owner, repo, newContent, {
   base,
   branchName
 } = {
@@ -53,7 +53,7 @@ const createPr = async (octokit, owner, repo, content, {
             // // do not create the file if it does not exist
             // if (!exists) return null;
 
-            return Buffer.from(content, encoding).toString("utf-8")
+            return Buffer.from(newContent, encoding).toString("utf-8")
           },
         },
         commit:
@@ -179,8 +179,7 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent, {});
-      console.log(a)
+      const a  = await createPr(octokit, config.orgName, repo.name, updatedFileContent);
       // await octokit.repos.createOrUpdateFileContents({
       //   owner: config.orgName,
       //   repo: repo.name,
