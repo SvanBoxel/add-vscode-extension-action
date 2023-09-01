@@ -38,7 +38,7 @@ const createPr = async (octokit, owner, repo, content, {
       {
         /* optional: if `files` is not passed, an empty commit is created instead */
         files: {
-          [filePath]: ({ exists, encoding, content }) => {
+          [config.filePath]: ({ exists, encoding, content }) => {
             // // do not create the file if it does not exist
             // if (!exists) return null;
 
