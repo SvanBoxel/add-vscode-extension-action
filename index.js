@@ -31,7 +31,7 @@ const createPr = async (octokit, owner, repo, newContent, {
     body: "pull request description",
     head: branchName,
     base: base,
-    update: false /* optional: set to `true` to enable updating existing pull requests */,
+    update: true /* update existing pull requests */,
     forceFork: false /* optional: force creating fork even when user has write rights */,
     changes: [
       {
