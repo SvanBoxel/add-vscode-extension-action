@@ -1,13 +1,16 @@
 const fs = require("fs");
 const { Octokit: OctokitCore} = require("@octokit/rest");
-const Octokit = OctokitCore.plugin(createPullRequest);
 
-const core = require('@actions/core');
 
 const {
   createPullRequest,
   DELETE_FILE,
 } = require("octokit-plugin-create-pull-request");
+
+const Octokit = OctokitCore.plugin(createPullRequest);
+
+const core = require('@actions/core');
+
 
 const config = {
   orgName: core.getInput('organization-name'),

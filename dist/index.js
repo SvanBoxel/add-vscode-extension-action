@@ -6,14 +6,17 @@
 
 const fs = __nccwpck_require__(7147);
 const { Octokit: OctokitCore} = __nccwpck_require__(9133);
-const Octokit = OctokitCore.plugin(createPullRequest);
 
-const core = __nccwpck_require__(5290);
 
 const {
   createPullRequest,
   DELETE_FILE,
 } = __nccwpck_require__(5321);
+
+const Octokit = OctokitCore.plugin(createPullRequest);
+
+const core = __nccwpck_require__(5290);
+
 
 const config = {
   orgName: core.getInput('organization-name'),
