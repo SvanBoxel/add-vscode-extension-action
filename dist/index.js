@@ -169,7 +169,7 @@ const main = async () => {
     } catch (error) {
       // If the file doesn't exist, create an empty object
       if (error.code === "ENOENT" || error.status === 404 ) {
-        fileContent = btoa("{}").toString();
+        fileContent = "{}";
         type = 'create'
       } else {
         throw error;
@@ -179,6 +179,12 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
+
+      console.log({
+        owner: config.orgName,
+        repo: repo.name,
+        updatedFileContent: updatedFileContent,
+      })
       await createPr(octokit, config.orgName, repo.name, updatedFileContent);
 
       if (type === 'create') {
