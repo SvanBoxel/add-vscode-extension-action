@@ -44,7 +44,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
       {
         /* optional: if `files` is not passed, an empty commit is created instead */
         files: {
-          [config.filePath]: ({ exists, encoding, content }) => {
+          [config.filePath]: ({ exists }) => {
             // // do not create the file if it does not exist
             // if (!exists) return null;
 
@@ -54,7 +54,7 @@ const createPr = async (octokit, owner, repo, newContent, options) => {
               exists,
             })
 
-            return Buffer.from(btoa(newContent), encoding).toString("utf-8")
+            return Buffer.from(btoa(newContent), 'base64').toString("utf-8")
           },
         },
         commit: config.commitMessage,
