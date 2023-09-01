@@ -2,6 +2,11 @@ const fs = require("fs");
 const { Octokit } = require("@octokit/rest");
 const core = require('@actions/core');
 
+const {
+  createPullRequest,
+  DELETE_FILE,
+} = require("octokit-plugin-create-pull-request");
+
 const config = {
   orgName: core.getInput('organization-name'),
   branchName: "add-extension-file",
@@ -10,6 +15,63 @@ const config = {
   input_extensions: core.getInput('extensions'),
   repositories: core.getInput('repositories'),
   token: core.getInput('github-token'),
+}
+
+const createPr = async (octokit, owner, repo, {
+  base,
+  branchName, 
+  content
+} = {
+  base: "main",
+  branchName: config.branchName
+}) => {
+  octokit
+  .createPullRequest({
+    owner,
+    repo,
+    title: "pull request title",
+    body: "pull request description",
+    head: branchName,
+    base: base,
+    update: false /* optional: set to `true` to enable updating existing pull requests */,
+    forceFork: false /* optional: force creating fork even when user has write rights */,
+    changes: [
+      {
+        /* optional: if `files` is not passed, an empty commit is created instead */
+        files: {
+          [filePath]: ({ exists, encoding, content }) => {
+            // // do not create the file if it does not exist
+            // if (!exists) return null;
+
+            return Buffer.from(content, encoding).toString("utf-8")
+          },
+        },
+        commit:
+          "creating ...",
+        author: {
+          name: "Author LastName",
+          email: "Author.LastName@acme.com",
+          date: new Date().toISOString(), // must be ISO date string
+        },
+        /* optional: if not passed, will use the information set in author */
+        committer: {
+          name: "Committer LastName",
+          email: "Committer.LastName@acme.com",
+          date: new Date().toISOString(), // must be ISO date string
+        },
+        /* optional: if not passed, commit won't be signed*/
+        signature: async function (commitPayload) {
+          // import { createSignature } from 'github-api-signature'
+          //
+          // return createSignature(
+          //   commitPayload,
+          //   privateKey,
+          //   passphrase
+          // );
+        },
+      },
+    ],
+  })
 }
 
 const getRepos = async (octokit, orgName, repos) => {
@@ -64,33 +126,6 @@ const updateExtensionFile = (currentExtensionContent, extensions) => {
   return JSON.stringify(newExtensionContent, null, 2);
 }
 
-const createRef = async (octokit, owner, repo, ref) => {
-  console.log({
-    a: 1,
-    owner,
-    repo,
-    ref
-  })
-  const result = await octokit.git.getRef({
-    owner,
-    repo,
-    ref
-  });
-
-  console.log({
-    result
-  })
-
-  const sha = result.data.object.sha;
-  await octokit.git.createRef({
-    owner,
-    repo,
-    ref,
-    sha,
-  });
-}
-
-
 const main = async () => {
   const stats = {
     repositoriesCount: 0,
@@ -108,8 +143,6 @@ const main = async () => {
   stats.repositoriesCount = repos.length;
 
   for (const repo of repos) {
-    await createRef(octokit, config.orgName, repo.name, `refs/heads/${config.branchName}`)
-
     // checkout file to see if it exists
     let fileContent = null;
     let type = null;
@@ -136,7 +169,8 @@ const main = async () => {
     let updatedFileContent;
     try {
       updatedFileContent = updateExtensionFile(fileContent, config.input_extensions, type);
-
+      const a  = await createPr(octokit, config.orgName, repo.name, {});
+      console.log(a)
       // await octokit.repos.createOrUpdateFileContents({
       //   owner: config.orgName,
       //   repo: repo.name,
