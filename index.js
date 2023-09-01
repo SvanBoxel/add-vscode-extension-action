@@ -123,7 +123,8 @@ const main = async () => {
     auth: core.getInput('github-token')
   });
 
-  let repos = await getRepos(octokit, core.getInput('organization-name'), core.getInput('repositories'))
+  const orgName = core.getInput('organization-name');
+  let repos = await getRepos(octokit, orgName, core.getInput('repositories'))
 
   stats.repositoriesCount = repos.length;
 
@@ -133,7 +134,7 @@ const main = async () => {
     let type = null;
     try {
       file = await octokit.repos.getContent({
-        owner: config.orgName,
+        owner: orgName,
         repo: repo.name,
         path: FILE_PATH,
         ref: repo.default_branch,
@@ -158,7 +159,7 @@ const main = async () => {
     try {
       updatedFileContent = updateExtensionFile(fileContent, core.getInput('extensions'), type);
 
-      await createPr(octokit, config.orgName, repo.name, updatedFileContent, {
+      await createPr(octokit, orgName, repo.name, updatedFileContent, {
         author_name: config.author_name,
         author_email: config.author_email,
         pullRequestTitle: config.pull_request_title,
