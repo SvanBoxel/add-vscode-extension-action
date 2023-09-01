@@ -7,8 +7,9 @@ const config = {
   branchName: "add-extension-file",
   commitMessage: "Add/edit vscode default extension file",
   filePath: ".vscode/extensions.json",
-  input_extensions: process.env.INPUT_EXTENSIONS,
-  repositories: core.getInput('repositories')
+  input_extensions: core.getInput('extensions'),
+  repositories: core.getInput('repositories'),
+  token: core.getInput('github-token'),
 }
 
 const getRepos = async (octokit, orgName, repos) => {
@@ -72,7 +73,7 @@ const main = async () => {
   }
 
   const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
+    auth: config.token
   });
 
   let repos = await getRepos(octokit, config.orgName, config.repositories)

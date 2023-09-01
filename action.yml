@@ -15,6 +15,9 @@ inputs:
     description: 'A list of repositories to add the file to. If no repositories are specified, the file will be added to all repositories in the organization.'
     required: false
     default: ''
+  github-token: 
+    description: 'The GitHub token to use for authentication.'
+    required: true
 
 runs:
   using: "node12"
