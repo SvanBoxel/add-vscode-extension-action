@@ -89,7 +89,7 @@ const main = async () => {
   console.log({ 
     repos
   })
-  for (const repo of repos.data) {
+  for (const repo of repos) {
     await octokit.git.createRef({
       owner: config.orgName,
       repo: repo.name,
