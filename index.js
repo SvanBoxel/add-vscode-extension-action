@@ -30,7 +30,7 @@ const createPr = async (octokit, owner, repo, newContent, {
   branchName: config.branchName
 }) => {
 
-  console.log({
+  console.log(22, {
     base, 
     branchName
   })
