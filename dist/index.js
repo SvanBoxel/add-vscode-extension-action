@@ -169,7 +169,7 @@ const main = async () => {
     } catch (error) {
       // If the file doesn't exist, create an empty object
       if (error.code === "ENOENT" || error.status === 404 ) {
-        fileContent = "{}";
+        fileContent = btoa("{}").toString();
         type = 'create'
       } else {
         throw error;
