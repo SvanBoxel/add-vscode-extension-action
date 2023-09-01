@@ -77,6 +77,10 @@ const createRef = async (octokit, owner, repo, ref) => {
     ref
   });
 
+  console.log({
+    result
+  })
+
   const sha = result.data.object.sha;
   await octokit.git.createRef({
     owner,
@@ -103,9 +107,6 @@ const main = async () => {
 
   stats.repositoriesCount = repos.length;
 
-  console.log({ 
-    repos
-  })
   for (const repo of repos) {
     await createRef(octokit, config.orgName, repo.name, `refs/heads/${config.branchName}`)
 
