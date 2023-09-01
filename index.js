@@ -159,15 +159,7 @@ const main = async () => {
     try {
       updatedFileContent = updateExtensionFile(fileContent, core.getInput('extensions'), type);
 
-      await createPr(octokit, orgName, repo.name, updatedFileContent, {
-        author_name: config.author_name,
-        author_email: config.author_email,
-        pullRequestTitle: config.pull_request_title,
-        pullRequestBody: config.pull_request_body,
-        commitMessage: config.commit_message,
-        base: repo.default_branch,
-        branchName: "add-extension-file",
-      });
+      await createPr(octokit, orgName, repo.name, updatedFileContent);
 
       if (type === 'create') {
         stats.filesCreated += 1;
