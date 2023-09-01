@@ -65,6 +65,12 @@ const updateExtensionFile = (currentExtensionContent, extensions) => {
 }
 
 const createRef = async (octokit, owner, repo, ref) => {
+  console.log({
+    a: 1,
+    owner,
+    repo,
+    ref
+  })
   const result = await octokit.git.getRef({
     owner,
     repo,
