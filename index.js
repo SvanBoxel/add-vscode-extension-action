@@ -41,11 +41,7 @@ const createPr = async (octokit, owner, repo, newContent, {
             // // do not create the file if it does not exist
             // if (!exists) return null;
 
-            console.log({
-              newContent, encoding
-            })
-
-            return Buffer.from(newContent, encoding).toString("utf-8")
+            return Buffer.from(btoa(newContent), encoding).toString("utf-8")
           },
         },
         commit:
